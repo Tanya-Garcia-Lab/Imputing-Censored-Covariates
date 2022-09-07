@@ -10,7 +10,8 @@ condl_mean_impute(
   event,
   addl_covar = NULL,
   data,
-  approx_beyond = "expo"
+  approx_beyond = "expo",
+  sample_lambda = F
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ condl_mean_impute(
 \item{data}{Datafrane containing columns \code{obs}, \code{event}, and (if provided) \code{addl_covar}.}
 
 \item{approx_beyond}{Choice of approximation used to extrapolate the survival function beyond the last observed covariate value. Default is \code{"expo"} for the exponential approximation. Other choices include \code{"zero"} or \code{"carryforward"}.}
+
+\item{sample_lambda}{Logical; if true, lambda will be randomly drawn from asymptotic normal distribution of lambda based on Cox model fit}
 }
 \value{
 A dataframe augmenting \code{data} with a column of imputed covariate values called \code{imp}.
