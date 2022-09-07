@@ -8,11 +8,13 @@
 #' @param addl_covar (Optional) string or vector of strings for the additional fully-observed covariates. Default is \code{NULL}.
 #' @param data Datafrane containing columns \code{obs}, \code{event}, and (if provided) \code{addl_covar}.
 #' @param approx_beyond Choice of approximation used to extrapolate the survival function beyond the last observed covariate value. Default is \code{"expo"} for the exponential approximation. Other choices include \code{"zero"} or \code{"carryforward"}.
+#' @param sample_lambda Logical; if true, lambda will be randomly drawn from asymptotic normal distribution of lambda based on Cox model fit
 #'
 #' @return A dataframe augmenting \code{data} with a column of imputed covariate values called \code{imp}.
 #'
 #' @export
-condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, approx_beyond = "expo") {
+condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, 
+                              approx_beyond = "expo", sample_lambda = F) {
   # test for bad input
   if (!is.character(obs)) { stop("argument obs must be a character") }
   if (!is.character(event)) { stop("argument event must be a character") }
@@ -28,18 +30,25 @@ condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, approx_b
   #### Still deciding whether the following conditions should produce errors (stop()) or warnings
   if (any(data[, obs] < 0)) { warning(paste("elements of column", obs, "must be positive")) }
   if (!all(data[, event] %in% c(0, 1))) { warning(paste("elements of column", event, "must be either 0 or 1")) }
+  
+  if (sample_lambda) { 
+    lambda = matrix(mvrnorm(1, fit$coefficients, vcov(fit)), ncol = 1)
+  } else { 
+    lambda = matrix(fit$coefficients, ncol = 1)
+  }
 
   if (is.null(addl_covar)) {
     # Estimate baseline survival from Kaplan-Meier estimator
     surv_df <- with(fit, data.frame(t = time, surv = surv))
   } else {
     # Calculate linear predictor \lambda %*% addl_covar for Cox model
-    lp <- data.matrix(data[, addl_covar]) %*% matrix(data = fit$coefficients, ncol = 1)
+    lp <- data.matrix(data[, addl_covar]) %*% lambda
     data$hr <- exp(lp)
     # Estimate baseline survival from Cox model fit using Breslow estimator
     cox_surv <- breslow_estimator(time = obs, event = event, hr = "hr", data = data)
     surv_df <- with(cox_surv, data.frame(t = times, surv = basesurv))
   }
+  
   colnames(surv_df)[1] <- obs
   # Merge survival estimates into data
   data <- merge(x = data, y = surv_df, all.x = TRUE, sort = FALSE)
