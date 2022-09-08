@@ -26,7 +26,7 @@ fit_lmer_to_imputed_list = function(imputed_list, formula) {
   estimates_list <- lapply(X = imputed_list, 
                            FUN = function(x) {
                              model <- lmer(formula = formula, data = x)
-                             estimates <- c(model$coefficients, diag(vcov(model)))
+                             estimates <- c(coef(model), diag(vcov(model)))
                            })
   
   # capture number of parameters
