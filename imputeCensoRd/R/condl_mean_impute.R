@@ -13,6 +13,7 @@
 #' @return A dataframe augmenting \code{data} with a column of imputed covariate values called \code{imp}.
 #'
 #' @export
+#' @importFrom MASS mvrnorm
 condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, approx_beyond = "expo", sample_lambda = F) {
   # test for bad input
   if (!is.character(obs)) { stop("argument obs must be a character") }
