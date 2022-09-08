@@ -67,6 +67,7 @@ The function `imputeCensoRd::condl_mean_impute()` imputes censored covariates wi
 - `addl_covar`: (Optional) string or vector of strings for the additional fully-observed covariates. Default is `NULL`.
 - `data`: Datafrane containing columns `obs`, `event`, and (if provided) `addl_covar`.
 - `approx_beyond`: Choice of approximation used to extrapolate the survival function beyond the last observed event time. Default is `"expo"` for the exponential approximation from Brown, Hollander, and Kowar (1974). Other choices include `"zero"`, which immediately goes to zero (Efron, 1967), or `"carryforward"`, which carries forward the survival at last event time (Gill, 1980).
+- `sample_lambda`: (Optional) A logical value. If TRUE, then lambda will be randomly sampled from its estimated asymptotic distribution according to the Cox model estimate.
 
 ```{r}
 # Fit the imputation model for x ~ z 
