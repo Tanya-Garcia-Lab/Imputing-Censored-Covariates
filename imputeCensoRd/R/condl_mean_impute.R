@@ -31,9 +31,11 @@ condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, approx_b
   if (any(data[, obs] < 0)) { warning(paste("elements of column", obs, "must be positive")) }
   if (!all(data[, event] %in% c(0, 1))) { warning(paste("elements of column", event, "must be either 0 or 1")) }
   
-  if (sample_lambda) { 
+  if (sample_lambda) {
+    # sample lambda from its asymptotic distribution
     lambda = matrix(mvrnorm(1, fit$coefficients, vcov(fit)), ncol = 1)
   } else { 
+    # use point estimate of lambda
     lambda = matrix(fit$coefficients, ncol = 1)
   }
 
@@ -109,7 +111,7 @@ condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, approx_b
     # Follow formula assuming Cox model with additional covariates Z
     for (x in which(!uncens)) {
       Zj <- data[x, addl_covar]
-      lp <- as.numeric(data.matrix(Zj) %*% matrix(data = fit$coefficients, ncol = 1))
+      lp <- as.numeric(data.matrix(Zj) %*% lambda)
       Cj <- data[x, obs]
       Sj <- data_dist[-1, "surv"] ^ (exp(lp)) + data_dist[-nrow(data_dist), "surv"] ^ (exp(lp))
       num <- sum((data_dist[-nrow(data_dist), obs] >= Cj) * Sj * t_diff)
