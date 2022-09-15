@@ -31,7 +31,7 @@ breslow_estimator <- function(time, event, hr, data) {
   if (any(data[, hr] < 0)) { warning(paste("elements of column", hr, "must be inclusively between 0 and 1"))}
   
   tj <- data[, time] # save vector of observed times 
-  dj <- aggregate(x = data[, event], by = (data[, obs]), FUN = sum) # tabulate number of deaths per tj 
+  dj <- aggregate(x = data[, event], by = data[, time], FUN = sum) # tabulate number of deaths per tj 
   dj <- dj[dj[, event] > 0, ] # subset to times with at least one death (i.e., dj > 0)
   tauj <- dj[, time] # observed failure times
   # create a dataframe for the riskset containing number of people still alive at or just before each tauj 
