@@ -22,11 +22,14 @@ fit_lmer_to_imputed_list = function(imputed_list, formula) {
   # determine number of bootstrap samples
   M = length(imputed_list)
   
-  # get list of length M, with each entry a vector of coefficient and SE estimates
-  estimates_list <- lapply(X = imputed_list, 
+  # get list of length M, with each entry a matrix of coefficient and SE estimates
+  estimates_list <- lapply(X = imputed_data_list, 
                            FUN = function(x) {
-                             model <- lmer(formula = formula, data = x)
-                             estimates <- c(coef(model), diag(vcov(model)))
+                             model_coef = x %>%
+                               lmer(formula = y ~ x1 + time_to_event_imp + (z1 - 1 | id) - 1, data = .) %>%
+                               summary() %>%
+                               .$coefficients
+                             model_coef[, 1:2]
                            })
   
   # capture number of parameters
@@ -36,8 +39,8 @@ fit_lmer_to_imputed_list = function(imputed_list, formula) {
   coef_matrix <- matrix(0, nrow = M, ncol = p)
   var_matrix <- matrix(0, nrow = M, ncol = p)
   for (i in 1:M) { 
-    coef_matrix[i, ] <- estimates_list[[i]][1:p]
-    var_matrix[i, ] <- estimates_list[[i]][-(1:p)]
+    coef_matrix[i, ] <- estimates_list[[i]][,1]
+    var_matrix[i, ] <- estimates_list[[i]][,2]^2
   }
   # name columns
   dimnames(coef_matrix)[[2]] <- dimnames(var_matrix)[[2]] <- names(estimates_list[[1]])[1:p]
