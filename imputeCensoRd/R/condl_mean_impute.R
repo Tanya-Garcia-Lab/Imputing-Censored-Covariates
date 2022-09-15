@@ -29,7 +29,7 @@ condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, approx_b
   # test for improper entries in columns of data
   #### Still deciding whether the following conditions should produce errors (stop()) or warnings
   if (any(data[, obs] < 0)) { warning(paste("elements of column", obs, "must be positive")) }
-  if (!all(data[, event] %in% c(0, 1))) { warning(paste("elements of column", event, "must be either 0 or 1")) }
+  if (!all(data[, event] == 0 | data[, event] == 1)) { warning(paste("elements of column", event, "must be either 0 or 1")) }
   
   if (sample_lambda) {
     # sample lambda from its asymptotic distribution
