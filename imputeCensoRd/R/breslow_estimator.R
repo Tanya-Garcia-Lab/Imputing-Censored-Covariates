@@ -42,7 +42,8 @@ breslow_estimator <- function(time, event, hr, data) {
   riskset$atrisk <- with(riskset, tauj <= tj)
   riskset$atrisk_hr <- with(riskset, atrisk * hr)
   # denominator for baseline hazard estimate
-  haz0_denom <- aggregate(formula = atrisk_hr ~ tauj, FUN = sum, data = riskset)
+  haz0_denom <- aggregate(x = riskset[, "atrisk_hr"], by = list(riskset[, "tauj"]), FUN = sum) # tabulate number of deaths per tj 
+  colnames(haz0_denom) = c("tauj", "atrisk_hr")
   
   # baseline hazard estimate
   haz0 <- dj[, event] / haz0_denom$atrisk_hr
