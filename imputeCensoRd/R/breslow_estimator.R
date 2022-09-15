@@ -14,27 +14,27 @@
 #'
 #' @export
 
-breslow_estimator <- function(time, event, hr, data) {
+breslow_estimator <- function(obs, event, hr, data) {
   # test for bad input
-  if (!is.character(time)) { stop("argument time must be a character") }
+  if (!is.character(obs)) { stop("argument obs must be a character") }
   if (!is.character(event)) { stop("argument event must be a character") }
   if (!is.character(hr)) { stop("argument hr must be a character") }
   if (!is.data.frame(data) & !is.matrix(data)) { stop("argument data must be a data frame or a matrix") }
   # test that data contains columns with specified names
-  if (!(time %in% colnames(data))) { stop(paste("data does not have column with name", time)) }
+  if (!(obs %in% colnames(data))) { stop(paste("data does not have column with name", obs)) }
   if (!(event %in% colnames(data))) { stop(paste("data does not have column with name", event)) }
   if (!(hr %in% colnames(data))) { stop(paste("data does not have column with name", hr)) }
   # test for improper entries in columns of data
   #### Still deciding whether the following conditions should produce errors (stop()) or warnings
-  if (any(data[, time] < 0)) { warning(paste("elements of column", time, "must be positive")) }
+  if (any(data[, obs] < 0)) { warning(paste("elements of column", obs, "must be positive")) }
   if (!all(data[, event] == 0 | data[, event] == 1)) { warning(paste("elements of column", event, "must be either 0 or 1")) }
   if (any(data[, hr] < 0)) { warning(paste("elements of column", hr, "must be inclusively between 0 and 1"))}
   
-  tj <- data[, time] # save vector of observed times 
-  dj <- aggregate(x = data[, event], by = list(data[, time]), FUN = sum) # tabulate number of deaths per tj 
-  colnames(dj) = c(time, event)
+  tj <- data[, obs] # save vector of observed times 
+  dj <- aggregate(x = data[, event], by = list(data[, obs]), FUN = sum) # tabulate number of deaths per tj 
+  colnames(dj) = c(obs, event)
   dj <- dj[dj[, event] > 0, ] # subset to times with at least one death (i.e., dj > 0)
-  tauj <- dj[, time] # observed failure times
+  tauj <- dj[, obs] # observed failure times
   # create a dataframe for the riskset containing number of people still alive at or just before each tauj 
   riskset <- data.frame(tauj = rep(tauj, times = length(tj)),
                         tj = rep(tj, each = length(tauj)),
