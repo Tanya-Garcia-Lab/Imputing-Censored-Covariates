@@ -47,7 +47,7 @@ condl_mean_impute <- function(fit, obs, event, addl_covar = NULL, data, approx_b
     lp <- data.matrix(data[, addl_covar]) %*% lambda
     data$hr <- exp(lp)
     # Estimate baseline survival from Cox model fit using Breslow estimator
-    cox_surv <- breslow_estimator(obs = obs, event = event, hr = "hr", data = data)
+    cox_surv <- breslow_estimator(time = obs, event = event, hr = "hr", data = data)
     surv_df <- with(cox_surv, data.frame(t = times, surv = basesurv))
   }
   
