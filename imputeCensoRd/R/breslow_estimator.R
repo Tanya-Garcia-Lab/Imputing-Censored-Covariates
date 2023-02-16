@@ -2,7 +2,7 @@
 #'
 #' Estimates the baseline survival function from a Cox proportional hazards model following Breslow's estimator.
 #'
-#' @param time String column name for the observed times.
+#' @param obs String column name for the observed times.
 #' @param event String column name for the censoring indicator of the covariate.
 #' @param hr String column name for the hazard ratios calculated from a \code{coxph} model fit.
 #' @param data Dataframe containing columns \code{time}, \code{event}, and \code{hr}.
